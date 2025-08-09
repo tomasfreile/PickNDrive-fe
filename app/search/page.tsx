@@ -1,0 +1,283 @@
+"use client"
+
+import { useState } from "react"
+import { Search, Star, Filter, ArrowUpDown, Shield } from "lucide-react"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { AuthModal } from "@/components/auth-modal"
+import { Navbar } from "@/components/navbar"
+
+export default function SearchPage() {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [sortBy, setSortBy] = useState("price")
+  const [showFilters, setShowFilters] = useState(false)
+  const router = useRouter()
+
+  const handleLogin = (email: string, password: string) => {
+    setCurrentUser({
+      firstName: "María",
+      lastName: "González",
+      email: email,
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format",
+    })
+    setIsLoggedIn(true)
+    console.log("Login successful:", email)
+  }
+
+  const handleRegister = (userData: any) => {
+    setCurrentUser(userData)
+    setIsLoggedIn(true)
+    console.log("Registration successful:", userData)
+  }
+
+  const handleLogout = () => {
+    setCurrentUser(null)
+    setIsLoggedIn(false)
+  }
+
+  const vehicles = [
+    {
+      id: 1,
+      title: "Toyota Corolla 2022",
+      price: 450,
+      rating: 4.8,
+      reviews: 23,
+      image: "https://images.unsplash.com/photo-1549924231-f129b911e442?w=400&h=300&fit=crop&auto=format",
+      owner: {
+        name: "María González",
+        avatar:
+          "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format",
+        verified: true,
+      },
+      features: ["Automatic", "A/C", "GPS", "Bluetooth"],
+      available: true,
+    },
+    {
+      id: 2,
+      title: "Honda Civic 2021",
+      price: 520,
+      rating: 4.9,
+      reviews: 31,
+      image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&h=300&fit=crop&auto=format",
+      owner: {
+        name: "Carlos Ruiz",
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format",
+        verified: true,
+      },
+      features: ["Manual", "A/C", "Rear camera", "USB"],
+      available: true,
+    },
+    {
+      id: 3,
+      title: "Nissan Sentra 2023",
+      price: 480,
+      rating: 4.7,
+      reviews: 18,
+      image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400&h=300&fit=crop&auto=format",
+      owner: {
+        name: "Ana López",
+        avatar:
+          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face&auto=format",
+        verified: true,
+      },
+      features: ["Automatic", "A/C", "Backup camera", "Bluetooth"],
+      available: true,
+    },
+    {
+      id: 4,
+      title: "Chevrolet Aveo 2020",
+      price: 320,
+      rating: 4.6,
+      reviews: 15,
+      image: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=400&h=300&fit=crop&auto=format",
+      owner: {
+        name: "Roberto Silva",
+        avatar:
+          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face&auto=format",
+        verified: true,
+      },
+      features: ["Manual", "A/C", "Radio", "Economic"],
+      available: true,
+    },
+    {
+      id: 5,
+      title: "Hyundai Elantra 2022",
+      price: 460,
+      rating: 4.8,
+      reviews: 27,
+      image: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=400&h=300&fit=crop&auto=format",
+      owner: {
+        name: "Luis Martínez",
+        avatar:
+          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face&auto=format",
+        verified: true,
+      },
+      features: ["Automatic", "A/C", "Apple CarPlay", "Lane assist"],
+      available: true,
+    },
+    {
+      id: 6,
+      title: "Kia Rio 2021",
+      price: 380,
+      rating: 4.5,
+      reviews: 12,
+      image: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop&auto=format",
+      owner: {
+        name: "Carmen Rodríguez",
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face&auto=format",
+        verified: true,
+      },
+      features: ["Manual", "A/C", "USB", "Compact"],
+      available: true,
+    },
+  ]
+
+  const sortedVehicles = [...vehicles].sort((a, b) => {
+    if (sortBy === "price") return a.price - b.price
+    if (sortBy === "rating") return b.rating - a.rating
+    return 0
+  })
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar
+        isLoggedIn={isLoggedIn}
+        currentUser={currentUser}
+        onLogin={() => setIsAuthModalOpen(true)}
+        onLogout={handleLogout}
+      />
+
+      {/* Search Section */}
+      <section className="bg-white border-b py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gray-50 rounded-xl p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="relative">
+                <Input
+                  placeholder="Start date"
+                  className="h-12 text-base border-2 border-gray-200 focus:border-brand-primary focus:ring-0 rounded-lg bg-white"
+                  type="date"
+                />
+              </div>
+              <div className="relative">
+                <Input
+                  placeholder="End date"
+                  className="h-12 text-base border-2 border-gray-200 focus:border-brand-primary focus:ring-0 rounded-lg bg-white"
+                  type="date"
+                />
+              </div>
+              <div className="flex flex-col justify-end">
+                <Button
+                  size="lg"
+                  className="h-12 bg-brand-primary hover:bg-brand-primary-dark text-base font-semibold rounded-lg"
+                >
+                  <Search className="h-4 w-4 mr-2" />
+                  Update Search
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Results Section */}
+      <section className="py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Results Header */}
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{vehicles.length} vehicles available</h1>
+              <p className="text-gray-600">Choose your perfect car</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)} className="md:hidden">
+                <Filter className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
+              <div className="flex items-center space-x-2">
+                <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="price">Price</SelectItem>
+                    <SelectItem value="rating">Rating</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Vehicle Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sortedVehicles.map((vehicle) => (
+              <Card
+                key={vehicle.id}
+                className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+                onClick={() => router.push("/car-details")}
+              >
+                <div className="relative">
+                  <Image
+                    src={vehicle.image || "/placeholder.svg"}
+                    alt={vehicle.title}
+                    width={400}
+                    height={250}
+                    className="w-full h-56 object-cover"
+                  />
+                  <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-lg">
+                    <div className="flex items-center space-x-1">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <span className="text-sm font-medium">{vehicle.rating}</span>
+                    </div>
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-xl mb-2">{vehicle.title}</h3>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {vehicle.features.slice(0, 3).map((feature, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {feature}
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={vehicle.owner.avatar || "/placeholder.svg"} />
+                        <AvatarFallback>{vehicle.owner.name[0]}</AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm text-gray-600">{vehicle.owner.name}</span>
+                      {vehicle.owner.verified && <Shield className="h-4 w-4 text-green-500" />}
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-2xl text-brand-primary">${vehicle.price}</div>
+                      <div className="text-sm text-gray-500">per day</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+      />
+    </div>
+  )
+}
