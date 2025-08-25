@@ -90,12 +90,14 @@ export function Navbar({ isLoggedIn = false, currentUser, onLogin, onLogout }: N
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-3">
-                <Button variant="ghost" onClick={onLogin} className="font-medium">
-                  Sign In
-                </Button>
-                <Button onClick={onLogin} className="font-medium bg-brand-primary hover:bg-brand-primary-dark">
-                  Sign Up
-                </Button>
+                <Link href="/auth">
+                  <Button variant="ghost" className="font-medium">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/auth">
+                  <Button className="font-medium bg-brand-primary hover:bg-brand-primary-dark">Sign Up</Button>
+                </Link>
               </div>
             )}
           </div>
@@ -158,25 +160,23 @@ export function Navbar({ isLoggedIn = false, currentUser, onLogin, onLogout }: N
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        onLogin?.()
-                        setIsMobileMenuOpen(false)
-                      }}
-                      className="w-full justify-start font-medium"
-                    >
-                      Sign In
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        onLogin?.()
-                        setIsMobileMenuOpen(false)
-                      }}
-                      className="w-full font-medium bg-brand-primary hover:bg-brand-primary-dark"
-                    >
-                      Sign Up
-                    </Button>
+                    <Link href="/auth">
+                      <Button
+                        variant="ghost"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="w-full justify-start font-medium"
+                      >
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/auth">
+                      <Button
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="w-full font-medium bg-brand-primary hover:bg-brand-primary-dark"
+                      >
+                        Sign Up
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </div>

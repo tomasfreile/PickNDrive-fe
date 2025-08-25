@@ -11,33 +11,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AuthModal } from "@/components/auth-modal"
 import { Navbar } from "@/components/navbar"
 
 export default function SearchPage() {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [sortBy, setSortBy] = useState("price")
   const [showFilters, setShowFilters] = useState(false)
   const router = useRouter()
-
-  const handleLogin = (email: string, password: string) => {
-    setCurrentUser({
-      firstName: "María",
-      lastName: "González",
-      email: email,
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format",
-    })
-    setIsLoggedIn(true)
-    console.log("Login successful:", email)
-  }
-
-  const handleRegister = (userData: any) => {
-    setCurrentUser(userData)
-    setIsLoggedIn(true)
-    console.log("Registration successful:", userData)
-  }
 
   const handleLogout = () => {
     setCurrentUser(null)
@@ -150,12 +131,7 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar
-        isLoggedIn={isLoggedIn}
-        currentUser={currentUser}
-        onLogin={() => setIsAuthModalOpen(true)}
-        onLogout={handleLogout}
-      />
+      <Navbar isLoggedIn={isLoggedIn} currentUser={currentUser} onLogout={handleLogout} />
 
       {/* Search Section */}
       <section className="bg-white border-b py-6">
@@ -271,13 +247,6 @@ export default function SearchPage() {
           </div>
         </div>
       </section>
-
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        onLogin={handleLogin}
-        onRegister={handleRegister}
-      />
     </div>
   )
 }
