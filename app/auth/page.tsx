@@ -1,8 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
-import { Eye, EyeOff, User, Mail, Lock, Phone, ArrowLeft } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Eye, EyeOff, User, Mail, Lock, Phone, ArrowLeft, MapPin } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -11,20 +11,100 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Logo } from "@/components/logo"
+
+interface Location {
+  id: string
+  name: string
+  state: string
+  country: string
+}
 
 export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [locations, setLocations] = useState<Location[]>([])
+  const [loadingLocations, setLoadingLocations] = useState(false)
   const [loginData, setLoginData] = useState({ email: "", password: "" })
   const [registerData, setRegisterData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
+    location: "",
     password: "",
     confirmPassword: "",
   })
   const router = useRouter()
+
+  // Fetch locations from API
+  useEffect(() => {
+    const fetchLocations = async () => {
+      setLoadingLocations(true)
+      try {
+        // Using REST Countries API to get Argentine provinces/cities
+        // In a real app, you'd use a proper location API like Google Places or similar
+        const response = await fetch("https://api.countrystatecity.in/v1/countries/AR/states", {
+          headers: {
+            "X-CSCAPI-KEY": "YOUR_API_KEY_HERE", // You'd need to get an API key
+          },
+        })
+
+        if (!response.ok) {
+          // Fallback to static data if API fails
+          throw new Error("API failed")
+        }
+
+        const data = await response.json()
+        const formattedLocations = data.map((state: any) => ({
+          id: state.iso2,
+          name: state.name,
+          state: state.name,
+          country: "Argentina",
+        }))
+        setLocations(formattedLocations)
+      } catch (error) {
+        // Fallback to static Argentine provinces/cities
+        const fallbackLocations: Location[] = [
+          { id: "caba", name: "Ciudad Autónoma de Buenos Aires", state: "CABA", country: "Argentina" },
+          { id: "la_plata", name: "La Plata", state: "Buenos Aires", country: "Argentina" },
+          { id: "mar_del_plata", name: "Mar del Plata", state: "Buenos Aires", country: "Argentina" },
+          { id: "cordoba", name: "Córdoba", state: "Córdoba", country: "Argentina" },
+          { id: "rosario", name: "Rosario", state: "Santa Fe", country: "Argentina" },
+          { id: "mendoza", name: "Mendoza", state: "Mendoza", country: "Argentina" },
+          { id: "tucuman", name: "San Miguel de Tucumán", state: "Tucumán", country: "Argentina" },
+          { id: "salta", name: "Salta", state: "Salta", country: "Argentina" },
+          { id: "santa_fe", name: "Santa Fe", state: "Santa Fe", country: "Argentina" },
+          { id: "san_juan", name: "San Juan", state: "San Juan", country: "Argentina" },
+          { id: "resistencia", name: "Resistencia", state: "Chaco", country: "Argentina" },
+          { id: "neuquen", name: "Neuquén", state: "Neuquén", country: "Argentina" },
+          { id: "formosa", name: "Formosa", state: "Formosa", country: "Argentina" },
+          { id: "san_luis", name: "San Luis", state: "San Luis", country: "Argentina" },
+          { id: "catamarca", name: "San Fernando del Valle de Catamarca", state: "Catamarca", country: "Argentina" },
+          { id: "la_rioja", name: "La Rioja", state: "La Rioja", country: "Argentina" },
+          { id: "jujuy", name: "San Salvador de Jujuy", state: "Jujuy", country: "Argentina" },
+          {
+            id: "santiago_del_estero",
+            name: "Santiago del Estero",
+            state: "Santiago del Estero",
+            country: "Argentina",
+          },
+          { id: "posadas", name: "Posadas", state: "Misiones", country: "Argentina" },
+          { id: "corrientes", name: "Corrientes", state: "Corrientes", country: "Argentina" },
+          { id: "parana", name: "Paraná", state: "Entre Ríos", country: "Argentina" },
+          { id: "viedma", name: "Viedma", state: "Río Negro", country: "Argentina" },
+          { id: "rawson", name: "Rawson", state: "Chubut", country: "Argentina" },
+          { id: "rio_gallegos", name: "Río Gallegos", state: "Santa Cruz", country: "Argentina" },
+          { id: "ushuaia", name: "Ushuaia", state: "Tierra del Fuego", country: "Argentina" },
+        ]
+        setLocations(fallbackLocations)
+      } finally {
+        setLoadingLocations(false)
+      }
+    }
+
+    fetchLocations()
+  }, [])
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -38,6 +118,10 @@ export default function AuthPage() {
     e.preventDefault()
     if (registerData.password !== registerData.confirmPassword) {
       alert("Passwords don't match")
+      return
+    }
+    if (!registerData.location) {
+      alert("Please select your location")
       return
     }
     // Simulate successful registration
@@ -177,13 +261,41 @@ export default function AuthPage() {
                         <Input
                           id="phone"
                           type="tel"
-                          placeholder="+52 81 1234 5678"
+                          placeholder="+54 11 1234 5678"
                           className="pl-10"
                           value={registerData.phone}
                           onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
                           required
                         />
                       </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="location">Location</Label>
+                      <Select
+                        value={registerData.location}
+                        onValueChange={(value) => setRegisterData({ ...registerData, location: value })}
+                        required
+                      >
+                        <SelectTrigger className="w-full">
+                          <div className="flex items-center">
+                            <MapPin className="h-4 w-4 text-gray-400 mr-2" />
+                            <SelectValue placeholder={loadingLocations ? "Loading locations..." : "Select your city"} />
+                          </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {loadingLocations ? (
+                            <SelectItem value="loading" disabled>
+                              Loading locations...
+                            </SelectItem>
+                          ) : (
+                            locations.map((location) => (
+                              <SelectItem key={location.id} value={location.id}>
+                                {location.name}, {location.state}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="registerPassword">Password</Label>
