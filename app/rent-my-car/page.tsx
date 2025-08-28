@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Upload, MapPin, DollarSign, Camera, X, Check } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -36,6 +35,9 @@ export default function RentMyCarPage() {
     pricePerDay: "",
     rules: "",
   })
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [currentUser, setCurrentUser] = useState<any>(null)
 
   const router = useRouter()
 
@@ -94,9 +96,26 @@ export default function RentMyCarPage() {
 
   const progress = (currentStep / steps.length) * 100
 
+  useEffect(() => {
+    const storedIsLoggedIn = localStorage.getItem("isLoggedIn")
+    const storedUser = localStorage.getItem("currentUser")
+
+    if (storedIsLoggedIn === "true" && storedUser) {
+      setIsLoggedIn(true)
+      setCurrentUser(JSON.parse(storedUser))
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn")
+    localStorage.removeItem("currentUser")
+    setCurrentUser(null)
+    setIsLoggedIn(false)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar isLoggedIn={isLoggedIn} currentUser={currentUser} onLogout={handleLogout} />
 
       {/* Progress Bar */}
       <div className="bg-white border-b">

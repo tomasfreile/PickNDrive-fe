@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, Star, Filter, ArrowUpDown, Shield } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -20,7 +20,20 @@ export default function SearchPage() {
   const [showFilters, setShowFilters] = useState(false)
   const router = useRouter()
 
+  // Add useEffect to check localStorage on component mount
+  useEffect(() => {
+    const storedIsLoggedIn = localStorage.getItem("isLoggedIn")
+    const storedUser = localStorage.getItem("currentUser")
+
+    if (storedIsLoggedIn === "true" && storedUser) {
+      setIsLoggedIn(true)
+      setCurrentUser(JSON.parse(storedUser))
+    }
+  }, [])
+
   const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn")
+    localStorage.removeItem("currentUser")
     setCurrentUser(null)
     setIsLoggedIn(false)
   }

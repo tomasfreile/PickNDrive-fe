@@ -108,7 +108,18 @@ export default function AuthPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulate successful login
+    // Simulate successful login - in a real app, you'd validate credentials
+    const mockUser = {
+      firstName: loginData.email.split("@")[0],
+      lastName: "",
+      email: loginData.email,
+      avatar: "/placeholder.svg",
+    }
+
+    // Store user data in localStorage to persist across page reloads
+    localStorage.setItem("isLoggedIn", "true")
+    localStorage.setItem("currentUser", JSON.stringify(mockUser))
+
     console.log("Login successful:", loginData.email)
     // Redirect to home page or previous page
     router.push("/")
@@ -124,7 +135,19 @@ export default function AuthPage() {
       alert("Please select your location")
       return
     }
+
     // Simulate successful registration
+    const newUser = {
+      firstName: registerData.firstName,
+      lastName: registerData.lastName,
+      email: registerData.email,
+      avatar: "/placeholder.svg",
+    }
+
+    // Store user data in localStorage
+    localStorage.setItem("isLoggedIn", "true")
+    localStorage.setItem("currentUser", JSON.stringify(newUser))
+
     console.log("Registration successful:", registerData)
     // Redirect to home page
     router.push("/")
@@ -135,13 +158,14 @@ export default function AuthPage() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center space-x-2">
+          <div className="flex items-center h-16 relative">
+            <Link href="/" className="flex items-center space-x-2 absolute left-0">
               <ArrowLeft className="h-5 w-5 text-gray-600" />
               <span className="text-gray-600 font-medium">Back to home</span>
             </Link>
-            <Logo />
-            <div className="w-24"></div> {/* Spacer for centering */}
+            <div className="flex-1 flex justify-center">
+              <Logo />
+            </div>
           </div>
         </div>
       </header>

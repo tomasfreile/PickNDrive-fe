@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, Star, Shield, Clock, DollarSign, ArrowRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -18,7 +18,19 @@ export default function PickNDrivePrototype() {
   const [currentUser, setCurrentUser] = useState<any>(null)
   const router = useRouter()
 
+  useEffect(() => {
+    const storedIsLoggedIn = localStorage.getItem("isLoggedIn")
+    const storedUser = localStorage.getItem("currentUser")
+
+    if (storedIsLoggedIn === "true" && storedUser) {
+      setIsLoggedIn(true)
+      setCurrentUser(JSON.parse(storedUser))
+    }
+  }, [])
+
   const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn")
+    localStorage.removeItem("currentUser")
     setCurrentUser(null)
     setIsLoggedIn(false)
   }

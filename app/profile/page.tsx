@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   User,
   Mail,
@@ -34,8 +34,8 @@ export default function ProfilePage() {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [selectedBooking, setSelectedBooking] = useState<any>(null)
   const [reviewData, setReviewData] = useState({ rating: 0, comment: "" })
-  const [isLoggedIn] = useState(true)
-  const [currentUser] = useState({
+  const [isLoggedIn, setIsLoggedIn] = useState(true)
+  const [currentUser, setCurrentUser] = useState({
     firstName: "Maria",
     lastName: "Gonzalez",
     email: "maria.gonzalez@email.com",
@@ -131,8 +131,20 @@ export default function ProfilePage() {
   }
 
   const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn")
+    localStorage.removeItem("currentUser")
     alert("Signing out...")
+    // Redirect to home page after logout
+    window.location.href = "/"
   }
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("currentUser")
+    if (storedUser) {
+      const user = JSON.parse(storedUser)
+      setCurrentUser(user)
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50">
