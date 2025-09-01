@@ -228,11 +228,6 @@ export default function AuthPage() {
                       Sign in
                     </Button>
                   </form>
-                  <div className="text-center">
-                    <a href="#" className="text-sm text-brand-primary hover:underline">
-                      Forgot your password?
-                    </a>
-                  </div>
                 </TabsContent>
 
                 <TabsContent value="register" className="space-y-6">
