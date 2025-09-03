@@ -34,6 +34,14 @@ export function Navbar({ isLoggedIn = false, currentUser, onLogin, onLogout }: N
 
   const isActive = (href: string) => pathname === href
 
+  // Function to get a valid avatar URL or null
+  const getAvatarUrl = (avatar: string | undefined) => {
+    if (!avatar || avatar === "/placeholder.svg" || avatar.includes("placeholder")) {
+      return null
+    }
+    return avatar
+  }
+
   return (
     <header className="bg-white shadow-sm border-b sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-2 sm:px-2 lg:px-4">
@@ -65,9 +73,9 @@ export function Navbar({ isLoggedIn = false, currentUser, onLogin, onLogout }: N
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center space-x-2 h-10">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={currentUser.avatar || "/placeholder.svg"} />
-                      <AvatarFallback className="text-sm">
-                        {currentUser.firstName?.[0] || currentUser.email?.[0]?.toUpperCase() || "U"}
+                      <AvatarImage src={getAvatarUrl(currentUser.avatar) || "/placeholder.svg"} />
+                      <AvatarFallback className="bg-brand-primary text-white">
+                        <User className="h-4 w-4" />
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium">
@@ -141,9 +149,9 @@ export function Navbar({ isLoggedIn = false, currentUser, onLogin, onLogout }: N
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       <Avatar className="h-6 w-6 mr-3">
-                        <AvatarImage src={currentUser.avatar || "/placeholder.svg"} />
-                        <AvatarFallback className="text-xs">
-                          {currentUser.firstName?.[0] || currentUser.email?.[0]?.toUpperCase() || "U"}
+                        <AvatarImage src={getAvatarUrl(currentUser.avatar) || "/placeholder.svg"} />
+                        <AvatarFallback className="bg-brand-primary text-white">
+                          <User className="h-3 w-3" />
                         </AvatarFallback>
                       </Avatar>
                       My Profile
