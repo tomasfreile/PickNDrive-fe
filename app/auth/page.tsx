@@ -230,7 +230,6 @@ export default function AuthPage() {
                           className="pl-10"
                           value={loginData.email}
                           onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                          required
                         />
                       </div>
                     </div>
@@ -245,7 +244,6 @@ export default function AuthPage() {
                           className="pl-10 pr-10"
                           value={loginData.password}
                           onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                          required
                         />
                         <button
                           type="button"
@@ -275,7 +273,6 @@ export default function AuthPage() {
                             className={`pl-10 ${registerErrors.firstName ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                             value={registerData.firstName}
                             onChange={(e) => setRegisterData({ ...registerData, firstName: e.target.value })}
-                            required
                           />
                         </div>
                         {registerErrors.firstName && (
@@ -290,7 +287,6 @@ export default function AuthPage() {
                           className={`pl-10 ${registerErrors.lastName ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.lastName}
                           onChange={(e) => setRegisterData({ ...registerData, lastName: e.target.value })}
-                          required
                         />
                         {registerErrors.lastName && (
                           <p className="text-sm text-red-600 mt-1">{registerErrors.lastName}</p>
@@ -308,7 +304,6 @@ export default function AuthPage() {
                           className={`pl-10 ${registerErrors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.email}
                           onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                          required
                         />
                       </div>
                       {registerErrors.email && <p className="text-sm text-red-600 mt-1">{registerErrors.email}</p>}
@@ -324,7 +319,6 @@ export default function AuthPage() {
                           className={`pl-10 ${registerErrors.phone ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.phone}
                           onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
-                          required
                         />
                       </div>
                       {registerErrors.phone && <p className="text-sm text-red-600 mt-1">{registerErrors.phone}</p>}
@@ -334,7 +328,6 @@ export default function AuthPage() {
                       <Select
                         value={registerData.location}
                         onValueChange={(value) => setRegisterData({ ...registerData, location: value })}
-                        required
                       >
                         <SelectTrigger className="w-full">
                           <div className="flex items-center">
@@ -371,7 +364,6 @@ export default function AuthPage() {
                           className={`pl-10 pr-10 ${registerErrors.password ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.password}
                           onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                          required
                           minLength={8}
                         />
                         <button
@@ -397,7 +389,6 @@ export default function AuthPage() {
                           className={`pl-10 ${registerErrors.confirmPassword ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.confirmPassword}
                           onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                          required
                         />
                       </div>
                       {registerErrors.confirmPassword && (
