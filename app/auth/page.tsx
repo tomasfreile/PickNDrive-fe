@@ -35,6 +35,7 @@ export default function AuthPage() {
     password: "",
     confirmPassword: "",
   })
+  const [registerErrors, setRegisterErrors] = useState<{ [key: string]: string }>({})
   const router = useRouter()
 
   // Fetch locations from API
@@ -127,12 +128,43 @@ export default function AuthPage() {
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault()
-    if (registerData.password !== registerData.confirmPassword) {
-      alert("Passwords don't match")
-      return
+
+    // Clear previous errors
+    setRegisterErrors({})
+    const errors: { [key: string]: string } = {}
+
+    // Validate fields
+    if (!registerData.firstName.trim()) {
+      errors.firstName = "First name is required"
+    }
+    if (!registerData.lastName.trim()) {
+      errors.lastName = "Last name is required"
+    }
+    if (!registerData.email.trim()) {
+      errors.email = "Email is required"
+    } else if (!/\S+@\S+\.\S+/.test(registerData.email)) {
+      errors.email = "Please enter a valid email address"
+    }
+    if (!registerData.phone.trim()) {
+      errors.phone = "Phone number is required"
     }
     if (!registerData.location) {
-      alert("Please select your location")
+      errors.location = "Please select your location"
+    }
+    if (!registerData.password) {
+      errors.password = "Password is required"
+    } else if (registerData.password.length < 8) {
+      errors.password = "Password must be at least 8 characters"
+    }
+    if (!registerData.confirmPassword) {
+      errors.confirmPassword = "Please confirm your password"
+    } else if (registerData.password !== registerData.confirmPassword) {
+      errors.confirmPassword = "Passwords don't match"
+    }
+
+    // If there are errors, set them and return
+    if (Object.keys(errors).length > 0) {
+      setRegisterErrors(errors)
       return
     }
 
@@ -240,22 +272,29 @@ export default function AuthPage() {
                           <Input
                             id="firstName"
                             placeholder="First name"
-                            className="pl-10"
+                            className={`pl-10 ${registerErrors.firstName ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                             value={registerData.firstName}
                             onChange={(e) => setRegisterData({ ...registerData, firstName: e.target.value })}
                             required
                           />
                         </div>
+                        {registerErrors.firstName && (
+                          <p className="text-sm text-red-600 mt-1">{registerErrors.firstName}</p>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="lastName">Last name</Label>
                         <Input
                           id="lastName"
                           placeholder="Last name"
+                          className={`pl-10 ${registerErrors.lastName ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.lastName}
                           onChange={(e) => setRegisterData({ ...registerData, lastName: e.target.value })}
                           required
                         />
+                        {registerErrors.lastName && (
+                          <p className="text-sm text-red-600 mt-1">{registerErrors.lastName}</p>
+                        )}
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -266,12 +305,13 @@ export default function AuthPage() {
                           id="registerEmail"
                           type="email"
                           placeholder="your@email.com"
-                          className="pl-10"
+                          className={`pl-10 ${registerErrors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.email}
                           onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                           required
                         />
                       </div>
+                      {registerErrors.email && <p className="text-sm text-red-600 mt-1">{registerErrors.email}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone</Label>
@@ -281,12 +321,13 @@ export default function AuthPage() {
                           id="phone"
                           type="tel"
                           placeholder="+54 11 1234 5678"
-                          className="pl-10"
+                          className={`pl-10 ${registerErrors.phone ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.phone}
                           onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
                           required
                         />
                       </div>
+                      {registerErrors.phone && <p className="text-sm text-red-600 mt-1">{registerErrors.phone}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="location">Location</Label>
@@ -315,6 +356,9 @@ export default function AuthPage() {
                           )}
                         </SelectContent>
                       </Select>
+                      {registerErrors.location && (
+                        <p className="text-sm text-red-600 mt-1">{registerErrors.location}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="registerPassword">Password</Label>
@@ -324,7 +368,7 @@ export default function AuthPage() {
                           id="registerPassword"
                           type={showPassword ? "text" : "password"}
                           placeholder="Minimum 8 characters"
-                          className="pl-10 pr-10"
+                          className={`pl-10 pr-10 ${registerErrors.password ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.password}
                           onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                           required
@@ -338,6 +382,9 @@ export default function AuthPage() {
                           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                       </div>
+                      {registerErrors.password && (
+                        <p className="text-sm text-red-600 mt-1">{registerErrors.password}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="confirmPassword">Confirm password</Label>
@@ -347,12 +394,15 @@ export default function AuthPage() {
                           id="confirmPassword"
                           type={showPassword ? "text" : "password"}
                           placeholder="Confirm your password"
-                          className="pl-10"
+                          className={`pl-10 ${registerErrors.confirmPassword ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                           value={registerData.confirmPassword}
                           onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                           required
                         />
                       </div>
+                      {registerErrors.confirmPassword && (
+                        <p className="text-sm text-red-600 mt-1">{registerErrors.confirmPassword}</p>
+                      )}
                     </div>
                     <Button type="submit" className="w-full bg-brand-primary hover:bg-brand-primary-dark">
                       Create account
