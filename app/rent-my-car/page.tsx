@@ -172,6 +172,9 @@ export default function RentMyCarPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
+  const [vehicleId, setVehicleId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
   const [vehicleData, setVehicleData] = useState({
     category: "",
     brand: "",
@@ -190,9 +193,135 @@ export default function RentMyCarPage() {
 
   const steps = [
     { id: 1, title: "Vehicle Information", description: "Category, brand, model and basic details" },
-    { id: 2, title: "Attributes & Features", description: "Vehicle specifications and equipment" },
-    { id: 3, title: "Photos & Pricing", description: "Images, price and rental conditions" },
+    { id: 2, title: "Photos & Pricing", description: "Images, price and rental conditions" },
+    { id: 3, title: "Attributes & Features", description: "Vehicle specifications and equipment" },
   ]
+
+  // Simulate creating vehicle (no API call)
+  const createVehicle = async () => {
+    try {
+      setIsLoading(true)
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      // Generate a mock vehicle ID
+      const newVehicleId = `vehicle_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      setVehicleId(newVehicleId)
+
+      console.log("Vehicle created (simulated):", {
+        vehicleId: newVehicleId,
+        category: vehicleData.category,
+        brand: vehicleData.brand,
+        model: vehicleData.model,
+        year: vehicleData.year,
+        ownerId: currentUser?.id,
+      })
+
+      return newVehicleId
+    } catch (error) {
+      console.error("Error creating vehicle:", error)
+      alert("Error creating vehicle. Please try again.")
+      return null
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Simulate updating vehicle details (no API call)
+  const updateVehicleDetails = async (vehicleId: string) => {
+    try {
+      setIsLoading(true)
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      console.log("Vehicle details updated (simulated):", {
+        vehicleId,
+        description: vehicleData.description,
+        pricePerDay: vehicleData.pricePerDay,
+        rules: vehicleData.rules,
+        images: uploadedImages.length,
+      })
+
+      return true
+    } catch (error) {
+      console.error("Error updating vehicle:", error)
+      alert("Error updating vehicle details. Please try again.")
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Simulate saving attributes (no API call)
+  const saveAttributes = async (vehicleId: string) => {
+    try {
+      setIsLoading(true)
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      console.log("Attributes saved (simulated):", {
+        vehicleId,
+        attributes: vehicleData.attributes,
+      })
+
+      return true
+    } catch (error) {
+      console.error("Error saving attributes:", error)
+      alert("Error saving vehicle attributes. Please try again.")
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Simulate saving features (no API call)
+  const saveFeatures = async (vehicleId: string) => {
+    try {
+      setIsLoading(true)
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      console.log("Features saved (simulated):", {
+        vehicleId,
+        features: selectedFeatures,
+      })
+
+      return true
+    } catch (error) {
+      console.error("Error saving features:", error)
+      alert("Error saving vehicle features. Please try again.")
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Simulate publishing vehicle (no API call)
+  const publishVehicle = async (vehicleId: string) => {
+    try {
+      setIsLoading(true)
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      console.log("Vehicle published (simulated):", {
+        vehicleId,
+        status: "active",
+      })
+
+      return true
+    } catch (error) {
+      console.error("Error publishing vehicle:", error)
+      alert("Error publishing vehicle. Please try again.")
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -235,7 +364,17 @@ export default function RentMyCarPage() {
     setSelectedFeatures([])
   }
 
-  const nextStep = () => {
+  const nextStep = async () => {
+    if (currentStep === 1) {
+      // Step 1: Create vehicle with basic info
+      const newVehicleId = await createVehicle()
+      if (!newVehicleId) return // Stop if creation failed
+    } else if (currentStep === 2 && vehicleId) {
+      // Step 2: Update vehicle with photos, pricing, and details
+      const success = await updateVehicleDetails(vehicleId)
+      if (!success) return // Stop if update failed
+    }
+
     if (currentStep < steps.length) {
       setCurrentStep(currentStep + 1)
     }
@@ -244,6 +383,22 @@ export default function RentMyCarPage() {
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const handlePublishVehicle = async () => {
+    if (!vehicleId) return
+
+    // Step 3: Save attributes and features, then publish
+    const attributesSuccess = await saveAttributes(vehicleId)
+    const featuresSuccess = await saveFeatures(vehicleId)
+
+    if (attributesSuccess && featuresSuccess) {
+      const publishSuccess = await publishVehicle(vehicleId)
+      if (publishSuccess) {
+        alert("Vehicle listed successfully! Renters can now find and contact you.")
+        router.push("/")
+      }
     }
   }
 
@@ -270,6 +425,23 @@ export default function RentMyCarPage() {
     ? vehicleCategories[vehicleData.category as keyof typeof vehicleCategories]
     : null
   const availableBrands = vehicleData.category ? brands[vehicleData.category as keyof typeof brands] : []
+
+  // Validation functions
+  const canProceedFromStep1 = () => {
+    return vehicleData.category && vehicleData.brand && vehicleData.model && vehicleData.year
+  }
+
+  const canProceedFromStep2 = () => {
+    return vehicleData.description && vehicleData.pricePerDay && uploadedImages.length >= 1
+  }
+
+  const canPublishVehicle = () => {
+    if (!currentCategory) return false
+
+    // Check if all required attributes are filled
+    const requiredAttributes = Object.keys(currentCategory.attributes)
+    return requiredAttributes.every((attr) => vehicleData.attributes[attr])
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -405,68 +577,8 @@ export default function RentMyCarPage() {
               </div>
             )}
 
-            {/* Step 2: Attributes and Features */}
-            {currentStep === 2 && currentCategory && (
-              <div className="space-y-6">
-                {/* Attributes */}
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Vehicle Attributes</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(currentCategory.attributes).map(([key, attribute]) => (
-                      <div key={key}>
-                        <label className="block text-sm font-medium mb-2">{attribute.label}</label>
-                        <Select
-                          value={vehicleData.attributes[key] || ""}
-                          onValueChange={(value) => handleAttributeChange(key, value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={`Select ${attribute.label.toLowerCase()}`} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {attribute.options.map((option) => (
-                              <SelectItem key={option} value={option.toLowerCase()}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Features */}
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Vehicle Features</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {currentCategory.features.map((feature) => (
-                      <div
-                        key={feature}
-                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                          selectedFeatures.includes(feature)
-                            ? "border-brand-primary bg-brand-primary-light text-brand-primary"
-                            : "border-gray-200 hover:border-gray-300"
-                        }`}
-                        onClick={() => toggleFeature(feature)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={selectedFeatures.includes(feature)}
-                            onChange={() => toggleFeature(feature)}
-                          />
-                          <span className="text-sm">{feature}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Photos and Pricing */}
-            {currentStep === 3 && (
+            {/* Step 2: Photos and Pricing */}
+            {currentStep === 2 && (
               <div className="space-y-6">
                 {/* Photos */}
                 <div>
@@ -577,6 +689,66 @@ export default function RentMyCarPage() {
                     />
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Step 3: Attributes and Features */}
+            {currentStep === 3 && currentCategory && (
+              <div className="space-y-6">
+                {/* Dynamic Attributes */}
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Vehicle Attributes</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(currentCategory.attributes).map(([key, attribute]) => (
+                      <div key={key}>
+                        <label className="block text-sm font-medium mb-2">{attribute.label}</label>
+                        <Select
+                          value={vehicleData.attributes[key] || ""}
+                          onValueChange={(value) => handleAttributeChange(key, value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder={`Select ${attribute.label.toLowerCase()}`} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {attribute.options.map((option) => (
+                              <SelectItem key={option} value={option.toLowerCase()}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Dynamic Features */}
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Vehicle Features</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {currentCategory.features.map((feature) => (
+                      <div
+                        key={feature}
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                          selectedFeatures.includes(feature)
+                            ? "border-brand-primary bg-brand-primary-light text-brand-primary"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        onClick={() => toggleFeature(feature)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={selectedFeatures.includes(feature)}
+                            onChange={() => toggleFeature(feature)}
+                          />
+                          <span className="text-sm">{feature}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 <Separator />
 
@@ -609,24 +781,28 @@ export default function RentMyCarPage() {
 
             {/* Navigation Buttons */}
             <div className="flex justify-between pt-6">
-              <Button variant="outline" onClick={prevStep} disabled={currentStep === 1}>
+              <Button variant="outline" onClick={prevStep} disabled={currentStep === 1 || isLoading}>
                 Previous
               </Button>
               <div className="space-x-2">
                 {currentStep < steps.length ? (
-                  <Button onClick={nextStep} disabled={currentStep === 1 && !vehicleData.category}>
-                    Next
+                  <Button
+                    onClick={nextStep}
+                    disabled={
+                      isLoading ||
+                      (currentStep === 1 && !canProceedFromStep1()) ||
+                      (currentStep === 2 && !canProceedFromStep2())
+                    }
+                  >
+                    {isLoading ? "Saving..." : "Next"}
                   </Button>
                 ) : (
                   <Button
                     className="bg-green-600 hover:bg-green-700"
-                    onClick={() => {
-                      // Here you would normally submit the form
-                      alert("Vehicle listed successfully! Renters can now find and contact you.")
-                      router.push("/")
-                    }}
+                    onClick={handlePublishVehicle}
+                    disabled={isLoading || !canPublishVehicle()}
                   >
-                    Publish Vehicle
+                    {isLoading ? "Publishing..." : "Publish Vehicle"}
                   </Button>
                 )}
               </div>

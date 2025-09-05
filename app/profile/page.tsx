@@ -29,7 +29,7 @@ export default function ProfilePage() {
     location: "Monterrey, Nuevo Leon",
     memberSince: "2023",
     bio: "Travel enthusiast and responsible driver. I love meeting new people and helping others with their transportation needs.",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format",
+    avatar: "https://picsum.photos/200/300",
   })
 
   const userStats = {
