@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { Upload, MapPin, DollarSign, Camera, X, Check } from "lucide-react"
+import { Upload, DollarSign, Camera, X, Check } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 
@@ -17,23 +17,170 @@ import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import { Navbar } from "@/components/navbar"
 
+// Vehicle category configurations
+const vehicleCategories = {
+  sedan: {
+    name: "Sedan",
+    attributes: {
+      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
+      fuel: { label: "Fuel Type", options: ["Gasoline", "Hybrid", "Electric"] },
+      doors: { label: "Doors", options: ["2", "4"] },
+      seats: { label: "Seats", options: ["2", "4", "5"] },
+    },
+    features: [
+      "Air conditioning",
+      "GPS",
+      "Bluetooth",
+      "Rear camera",
+      "Parking sensors",
+      "Cruise control",
+      "Touch screen",
+      "USB/AUX",
+      "Leather seats",
+      "Sunroof",
+      "Premium sound system",
+      "Wireless charger",
+    ],
+  },
+  suv: {
+    name: "SUV",
+    attributes: {
+      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
+      fuel: { label: "Fuel Type", options: ["Gasoline", "Hybrid", "Electric", "Diesel"] },
+      drivetrain: { label: "Drivetrain", options: ["FWD", "AWD", "4WD"] },
+      seats: { label: "Seats", options: ["5", "7", "8"] },
+    },
+    features: [
+      "Air conditioning",
+      "GPS",
+      "Bluetooth",
+      "Rear camera",
+      "Parking sensors",
+      "Cruise control",
+      "Touch screen",
+      "USB/AUX",
+      "Leather seats",
+      "Sunroof",
+      "Premium sound system",
+      "Wireless charger",
+      "Roof rack",
+      "Tow hitch",
+      "Third row seating",
+      "All-terrain tires",
+    ],
+  },
+  hatchback: {
+    name: "Hatchback",
+    attributes: {
+      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
+      fuel: { label: "Fuel Type", options: ["Gasoline", "Hybrid", "Electric"] },
+      doors: { label: "Doors", options: ["3", "5"] },
+      seats: { label: "Seats", options: ["4", "5"] },
+    },
+    features: [
+      "Air conditioning",
+      "GPS",
+      "Bluetooth",
+      "Rear camera",
+      "Parking sensors",
+      "Touch screen",
+      "USB/AUX",
+      "Heated seats",
+      "Fog lights",
+    ],
+  },
+  coupe: {
+    name: "Coupe",
+    attributes: {
+      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
+      fuel: { label: "Fuel Type", options: ["Gasoline", "Hybrid", "Electric"] },
+      doors: { label: "Doors", options: ["2"] },
+      seats: { label: "Seats", options: ["2", "4"] },
+    },
+    features: [
+      "Air conditioning",
+      "GPS",
+      "Bluetooth",
+      "Rear camera",
+      "Parking sensors",
+      "Cruise control",
+      "Touch screen",
+      "USB/AUX",
+      "Leather seats",
+      "Sunroof",
+      "Premium sound system",
+      "Wireless charger",
+      "Sport mode",
+      "Performance tires",
+    ],
+  },
+  motorcycle: {
+    name: "Motorcycle",
+    attributes: {
+      engine: { label: "Engine Size", options: ["125cc", "250cc", "400cc", "600cc", "750cc", "1000cc+"] },
+      fuel: { label: "Fuel Type", options: ["Gasoline", "Electric"] },
+      type: { label: "Type", options: ["Sport", "Cruiser", "Touring", "Adventure", "Scooter"] },
+    },
+    features: [
+      "ABS",
+      "Traction control",
+      "Heated grips",
+      "Wind screen",
+      "Side cases",
+      "Top box",
+      "GPS mount",
+      "USB charger",
+      "LED lights",
+    ],
+  },
+  truck: {
+    name: "Truck",
+    attributes: {
+      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
+      fuel: { label: "Fuel Type", options: ["Gasoline", "Diesel", "Hybrid"] },
+      drivetrain: { label: "Drivetrain", options: ["RWD", "AWD", "4WD"] },
+      bedSize: { label: "Bed Size", options: ["Short", "Standard", "Long"] },
+      cab: { label: "Cab Type", options: ["Regular", "Extended", "Crew"] },
+    },
+    features: [
+      "Air conditioning",
+      "GPS",
+      "Bluetooth",
+      "Rear camera",
+      "Parking sensors",
+      "Touch screen",
+      "USB/AUX",
+      "Bed liner",
+      "Tow package",
+      "Running boards",
+      "Tonneau cover",
+      "Tool box",
+    ],
+  },
+}
+
+const brands = {
+  sedan: ["Toyota", "Honda", "Nissan", "Chevrolet", "Mazda", "Volkswagen", "BMW", "Mercedes-Benz", "Audi"],
+  suv: ["Toyota", "Honda", "Nissan", "Chevrolet", "Ford", "Jeep", "BMW", "Mercedes-Benz", "Audi", "Volvo"],
+  hatchback: ["Toyota", "Honda", "Nissan", "Chevrolet", "Mazda", "Volkswagen", "Ford"],
+  coupe: ["BMW", "Mercedes-Benz", "Audi", "Chevrolet", "Ford", "Nissan", "Toyota"],
+  motorcycle: ["Honda", "Yamaha", "Kawasaki", "Suzuki", "Ducati", "BMW", "Harley-Davidson"],
+  truck: ["Ford", "Chevrolet", "Ram", "Toyota", "Nissan", "GMC"],
+}
+
 export default function RentMyCarPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [uploadedImages, setUploadedImages] = useState<string[]>([])
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [vehicleData, setVehicleData] = useState({
-    make: "",
+    category: "",
+    brand: "",
     model: "",
     year: "",
-    transmission: "",
-    fuel: "",
-    seats: "",
-    doors: "",
-    mileage: "",
-    location: "",
     description: "",
     pricePerDay: "",
     rules: "",
+    attributes: {} as Record<string, string>,
   })
 
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -42,24 +189,9 @@ export default function RentMyCarPage() {
   const router = useRouter()
 
   const steps = [
-    { id: 1, title: "Vehicle Information", description: "Basic details and photos" },
-    { id: 2, title: "Features and Price", description: "Equipment and daily rate" },
-    { id: 3, title: "Location and Rules", description: "Pickup location and rental conditions" },
-  ]
-
-  const features = [
-    "Air conditioning",
-    "GPS",
-    "Bluetooth",
-    "Rear camera",
-    "Parking sensors",
-    "Cruise control",
-    "Touch screen",
-    "USB/AUX",
-    "Leather seats",
-    "Sunroof",
-    "Premium sound system",
-    "Wireless charger",
+    { id: 1, title: "Vehicle Information", description: "Category, brand, model and basic details" },
+    { id: 2, title: "Attributes & Features", description: "Vehicle specifications and equipment" },
+    { id: 3, title: "Photos & Pricing", description: "Images, price and rental conditions" },
   ]
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +212,27 @@ export default function RentMyCarPage() {
         ? selectedFeatures.filter((f) => f !== feature)
         : [...selectedFeatures, feature],
     )
+  }
+
+  const handleAttributeChange = (attributeKey: string, value: string) => {
+    setVehicleData({
+      ...vehicleData,
+      attributes: {
+        ...vehicleData.attributes,
+        [attributeKey]: value,
+      },
+    })
+  }
+
+  const handleCategoryChange = (category: string) => {
+    // Reset dependent fields when category changes
+    setVehicleData({
+      ...vehicleData,
+      category,
+      brand: "",
+      attributes: {},
+    })
+    setSelectedFeatures([])
   }
 
   const nextStep = () => {
@@ -112,6 +265,11 @@ export default function RentMyCarPage() {
     setCurrentUser(null)
     setIsLoggedIn(false)
   }
+
+  const currentCategory = vehicleData.category
+    ? vehicleCategories[vehicleData.category as keyof typeof vehicleCategories]
+    : null
+  const availableBrands = vehicleData.category ? brands[vehicleData.category as keyof typeof brands] : []
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -161,107 +319,164 @@ export default function RentMyCarPage() {
             <p className="text-gray-600">{steps[currentStep - 1].description}</p>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Step 1: Vehicle Information and Photos */}
+            {/* Step 1: Vehicle Information */}
             {currentStep === 1 && (
               <div className="space-y-6">
-                {/* Basic Information */}
+                {/* Category Selection */}
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Basic information</h3>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Brand</label>
-                        <Select
-                          value={vehicleData.make}
-                          onValueChange={(value) => setVehicleData({ ...vehicleData, make: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select brand" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="toyota">Toyota</SelectItem>
-                            <SelectItem value="honda">Honda</SelectItem>
-                            <SelectItem value="nissan">Nissan</SelectItem>
-                            <SelectItem value="chevrolet">Chevrolet</SelectItem>
-                            <SelectItem value="mazda">Mazda</SelectItem>
-                            <SelectItem value="volkswagen">Volkswagen</SelectItem>
-                          </SelectContent>
-                        </Select>
+                  <h3 className="text-lg font-medium mb-4">Vehicle Category</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {Object.entries(vehicleCategories).map(([key, category]) => (
+                      <div
+                        key={key}
+                        className={`p-4 border rounded-lg cursor-pointer transition-colors text-center ${
+                          vehicleData.category === key
+                            ? "border-brand-primary bg-brand-primary-light text-brand-primary"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        onClick={() => handleCategoryChange(key)}
+                      >
+                        <div className="font-medium">{category.name}</div>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Model</label>
-                        <Input
-                          placeholder="Ex: Corolla"
-                          value={vehicleData.model}
-                          onChange={(e) => setVehicleData({ ...vehicleData, model: e.target.value })}
-                        />
+                    ))}
+                  </div>
+                </div>
+
+                {vehicleData.category && (
+                  <>
+                    <Separator />
+
+                    {/* Basic Information */}
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Basic Information</h3>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium mb-2">Brand</label>
+                            <Select
+                              value={vehicleData.brand}
+                              onValueChange={(value) => setVehicleData({ ...vehicleData, brand: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select brand" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {availableBrands.map((brand) => (
+                                  <SelectItem key={brand} value={brand.toLowerCase()}>
+                                    {brand}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-2">Model</label>
+                            <Input
+                              placeholder="Ex: Corolla, Civic, etc."
+                              value={vehicleData.model}
+                              onChange={(e) => setVehicleData({ ...vehicleData, model: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium mb-2">Year</label>
+                            <Select
+                              value={vehicleData.year}
+                              onValueChange={(value) => setVehicleData({ ...vehicleData, year: value })}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Year" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Array.from({ length: 15 }, (_, i) => 2024 - i).map((year) => (
+                                  <SelectItem key={year} value={year.toString()}>
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Year</label>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Step 2: Attributes and Features */}
+            {currentStep === 2 && currentCategory && (
+              <div className="space-y-6">
+                {/* Attributes */}
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Vehicle Attributes</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(currentCategory.attributes).map(([key, attribute]) => (
+                      <div key={key}>
+                        <label className="block text-sm font-medium mb-2">{attribute.label}</label>
                         <Select
-                          value={vehicleData.year}
-                          onValueChange={(value) => setVehicleData({ ...vehicleData, year: value })}
+                          value={vehicleData.attributes[key] || ""}
+                          onValueChange={(value) => handleAttributeChange(key, value)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Year" />
+                            <SelectValue placeholder={`Select ${attribute.label.toLowerCase()}`} />
                           </SelectTrigger>
                           <SelectContent>
-                            {Array.from({ length: 15 }, (_, i) => 2024 - i).map((year) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
+                            {attribute.options.map((option) => (
+                              <SelectItem key={option} value={option.toLowerCase()}>
+                                {option}
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Transmission</label>
-                        <Select
-                          value={vehicleData.transmission}
-                          onValueChange={(value) => setVehicleData({ ...vehicleData, transmission: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Transmission" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="automatic">Automatic</SelectItem>
-                            <SelectItem value="manual">Manual</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">Fuel</label>
-                        <Select
-                          value={vehicleData.fuel}
-                          onValueChange={(value) => setVehicleData({ ...vehicleData, fuel: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Fuel" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="gasoline">Gasoline</SelectItem>
-                            <SelectItem value="hybrid">Hybrid</SelectItem>
-                            <SelectItem value="electric">Electric</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
 
                 <Separator />
 
+                {/* Features */}
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Vehicle Features</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {currentCategory.features.map((feature) => (
+                      <div
+                        key={feature}
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                          selectedFeatures.includes(feature)
+                            ? "border-brand-primary bg-brand-primary-light text-brand-primary"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        onClick={() => toggleFeature(feature)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={selectedFeatures.includes(feature)}
+                            onChange={() => toggleFeature(feature)}
+                          />
+                          <span className="text-sm">{feature}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Photos and Pricing */}
+            {currentStep === 3 && (
+              <div className="space-y-6">
                 {/* Photos */}
                 <div>
-                  <h3 className="text-lg font-medium mb-4">Vehicle photos</h3>
+                  <h3 className="text-lg font-medium mb-4">Vehicle Photos</h3>
                   <div className="text-center">
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                       <Camera className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                       <h4 className="font-medium mb-2">Upload photos of your vehicle</h4>
                       <p className="text-gray-600 text-sm mb-4">
-                        Add at least 3 photos. The first photos are the most important.
+                        Add at least 3 photos. The first photo will be the main image.
                       </p>
                       <input
                         type="file"
@@ -306,37 +521,6 @@ export default function RentMyCarPage() {
                     </div>
                   )}
                 </div>
-              </div>
-            )}
-
-            {/* Step 2: Features and Pricing */}
-            {currentStep === 2 && (
-              <div className="space-y-6">
-                {/* Features */}
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Vehicle features</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {features.map((feature) => (
-                      <div
-                        key={feature}
-                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                          selectedFeatures.includes(feature)
-                            ? "border-brand-primary bg-brand-primary-light text-brand-primary"
-                            : "border-gray-200 hover:border-gray-300"
-                        }`}
-                        onClick={() => toggleFeature(feature)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={selectedFeatures.includes(feature)}
-                            onChange={() => toggleFeature(feature)}
-                          />
-                          <span className="text-sm">{feature}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
                 <Separator />
 
@@ -369,39 +553,13 @@ export default function RentMyCarPage() {
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Step 3: Location and Rules */}
-            {currentStep === 3 && (
-              <div className="space-y-6">
-                {/* Location */}
-                <div>
-                  <h3 className="text-lg font-medium mb-4">Pickup Location</h3>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Address</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                      <Input
-                        placeholder="Address where renters can pick up the vehicle"
-                        className="pl-10"
-                        value={vehicleData.location}
-                        onChange={(e) => setVehicleData({ ...vehicleData, location: e.target.value })}
-                      />
-                    </div>
-                    <p className="text-sm text-gray-600 mt-2">
-                      This will be the meeting point for vehicle handover. You can provide more specific details when
-                      contacted by renters.
-                    </p>
-                  </div>
-                </div>
 
                 <Separator />
 
                 {/* Description and Rules */}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Vehicle description</label>
+                    <label className="block text-sm font-medium mb-2">Vehicle Description</label>
                     <Textarea
                       placeholder="Describe your vehicle, its condition, special features, etc."
                       rows={3}
@@ -410,7 +568,7 @@ export default function RentMyCarPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Rules and conditions</label>
+                    <label className="block text-sm font-medium mb-2">Rental Rules</label>
                     <Textarea
                       placeholder="Ex: No smoking, return with the same fuel level, maximum 200 km per day, etc."
                       rows={3}
@@ -422,21 +580,9 @@ export default function RentMyCarPage() {
 
                 <Separator />
 
-                {/* Availability Information */}
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-green-900 mb-2">Availability</h4>
-                  <p className="text-sm text-green-800">
-                    Your vehicle will be marked as available for rent. When someone books your car, it will
-                    automatically become unavailable for those dates. You can manage bookings and availability through
-                    your profile.
-                  </p>
-                </div>
-
-                <Separator />
-
                 {/* Terms */}
                 <div className="space-y-3">
-                  <h4 className="font-medium">Terms and conditions</h4>
+                  <h4 className="font-medium">Confirmation</h4>
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
                       <Checkbox id="insurance" />
@@ -468,7 +614,9 @@ export default function RentMyCarPage() {
               </Button>
               <div className="space-x-2">
                 {currentStep < steps.length ? (
-                  <Button onClick={nextStep}>Next</Button>
+                  <Button onClick={nextStep} disabled={currentStep === 1 && !vehicleData.category}>
+                    Next
+                  </Button>
                 ) : (
                   <Button
                     className="bg-green-600 hover:bg-green-700"
@@ -478,7 +626,7 @@ export default function RentMyCarPage() {
                       router.push("/")
                     }}
                   >
-                    Publish vehicle
+                    Publish Vehicle
                   </Button>
                 )}
               </div>
