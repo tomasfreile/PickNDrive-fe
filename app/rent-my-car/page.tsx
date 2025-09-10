@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Navbar } from "@/components/navbar"
 import { ProgressBar } from "@/components/rent-my-car/progress-bar"
-import { VehicleCategories } from "@/components/rent-my-car/vehicle-categories"
+import { VehicleCategoryList } from "@/components/rent-my-car/vehicle-categories"
 import { BasicInformation } from "@/components/rent-my-car/basic-information"
 import { PhotoUpload } from "@/components/rent-my-car/photo-upload"
 import { PricingSection } from "@/components/rent-my-car/pricing-section"
@@ -197,7 +197,7 @@ export default function RentMyCarPage() {
             {/* Step 1: Vehicle Information */}
             {currentStep === 1 && (
               <div className="space-y-6">
-                <VehicleCategories
+                <VehicleCategoryList
                   categories={vehicleCategories}
                   selectedCategory={vehicleData.category}
                   onCategoryChange={handleCategoryChange}
