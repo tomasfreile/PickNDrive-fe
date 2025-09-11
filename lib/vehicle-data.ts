@@ -1,20 +1,29 @@
-// Type definitions for vehicle data
+export interface AttributeOption {
+  id: string
+  value: string
+}
+
 export interface VehicleAttribute {
-  label: string
-  options: string[]
+  id: string
+  attribute: string 
+  options: AttributeOption[]
+}
+
+export interface VehicleFeature {
+  id: string
+  name: string
 }
 
 export interface VehicleCategory {
+  id: string
   name: string
-  attributes: Record<string, VehicleAttribute>
-  features: string[]
+  attributes: VehicleAttribute[]
+  features: VehicleFeature[]
 }
 
-// Dynamic categories and brands - will come from backend
 export type VehicleCategories = Record<string, VehicleCategory>
 export type VehicleBrands = Record<string, string[]>
 
-// Vehicle form data interfaces
 export interface VehicleFormData {
   category: string
   brand: string
@@ -23,7 +32,8 @@ export interface VehicleFormData {
   description: string
   pricePerDay: string
   rules: string
-  attributes: Record<string, string>
+  attributes: Record<string, string> // attributeName -> optionId
+  features: string[] // array of feature IDs
 }
 
 export interface VehicleStep {
@@ -32,155 +42,164 @@ export interface VehicleStep {
   description: string
 }
 
-// Main data exports - these will eventually come from API calls
+// Mock data for development - will be replaced with API calls
 export const vehicleCategories: VehicleCategories = {
   sedan: {
+    id: "1",
     name: "Sedan",
-    attributes: {
-      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
-      fuel: { label: "Fuel Type", options: ["Gasoline", "Hybrid", "Electric"] },
-      doors: { label: "Doors", options: ["2", "4"] },
-      seats: { label: "Seats", options: ["2", "4", "5"] },
-    },
-    features: [
-      "Air conditioning",
-      "GPS",
-      "Bluetooth",
-      "Rear camera",
-      "Parking sensors",
-      "Cruise control",
-      "Touch screen",
-      "USB/AUX",
-      "Leather seats",
-      "Sunroof",
-      "Premium sound system",
-      "Wireless charger",
+    attributes: [
+      {
+        id: "1",
+        attribute: "transmission",
+        options: [
+          { id: "1", value: "Automatic" },
+          { id: "2", value: "Manual" }
+        ]
+      },
+      {
+        id: "2",
+        attribute: "fuel",
+        options: [
+          { id: "3", value: "Gasoline" },
+          { id: "4", value: "Hybrid" },
+          { id: "5", value: "Electric" }
+        ]
+      },
+      {
+        id: "3",
+        attribute: "doors",
+        options: [
+          { id: "6", value: "2" },
+          { id: "7", value: "4" }
+        ]
+      },
+      {
+        id: "4",
+        attribute: "seats",
+        options: [
+          { id: "8", value: "2" },
+          { id: "9", value: "4" },
+          { id: "10", value: "5" }
+        ]
+      }
     ],
+    features: [
+      { id: "1", name: "Air conditioning" },
+      { id: "2", name: "GPS" },
+      { id: "3", name: "Bluetooth" },
+      { id: "4", name: "Rear camera" },
+      { id: "5", name: "Parking sensors" },
+      { id: "6", name: "Cruise control" },
+      { id: "7", name: "Touch screen" },
+      { id: "8", name: "USB/AUX" },
+    ]
   },
   suv: {
+    id: "2",
     name: "SUV",
-    attributes: {
-      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
-      fuel: { label: "Fuel Type", options: ["Gasoline", "Hybrid", "Electric", "Diesel"] },
-      drivetrain: { label: "Drivetrain", options: ["FWD", "AWD", "4WD"] },
-      seats: { label: "Seats", options: ["5", "7", "8"] },
-    },
-    features: [
-      "Air conditioning",
-      "GPS",
-      "Bluetooth",
-      "Rear camera",
-      "Parking sensors",
-      "Cruise control",
-      "Touch screen",
-      "USB/AUX",
-      "Leather seats",
-      "Sunroof",
-      "Premium sound system",
-      "Wireless charger",
-      "Roof rack",
-      "Tow hitch",
-      "Third row seating",
-      "All-terrain tires",
+    attributes: [
+      {
+        id: "5",
+        attribute: "transmission",
+        options: [
+          { id: "11", value: "Automatic" },
+          { id: "12", value: "Manual" }
+        ]
+      },
+      {
+        id: "6",
+        attribute: "fuel",
+        options: [
+          { id: "13", value: "Gasoline" },
+          { id: "14", value: "Hybrid" },
+          { id: "15", value: "Electric" },
+          { id: "16", value: "Diesel" }
+        ]
+      },
+      {
+        id: "7",
+        attribute: "drivetrain",
+        options: [
+          { id: "17", value: "FWD" },
+          { id: "18", value: "AWD" },
+          { id: "19", value: "4WD" }
+        ]
+      },
+      {
+        id: "8",
+        attribute: "seats",
+        options: [
+          { id: "20", value: "5" },
+          { id: "21", value: "7" },
+          { id: "22", value: "8" }
+        ]
+      }
     ],
-  },
-  hatchback: {
-    name: "Hatchback",
-    attributes: {
-      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
-      fuel: { label: "Fuel Type", options: ["Gasoline", "Hybrid", "Electric"] },
-      doors: { label: "Doors", options: ["3", "5"] },
-      seats: { label: "Seats", options: ["4", "5"] },
-    },
     features: [
-      "Air conditioning",
-      "GPS",
-      "Bluetooth",
-      "Rear camera",
-      "Parking sensors",
-      "Touch screen",
-      "USB/AUX",
-      "Heated seats",
-      "Fog lights",
-    ],
-  },
-  coupe: {
-    name: "Coupe",
-    attributes: {
-      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
-      fuel: { label: "Fuel Type", options: ["Gasoline", "Hybrid", "Electric"] },
-      doors: { label: "Doors", options: ["2"] },
-      seats: { label: "Seats", options: ["2", "4"] },
-    },
-    features: [
-      "Air conditioning",
-      "GPS",
-      "Bluetooth",
-      "Rear camera",
-      "Parking sensors",
-      "Cruise control",
-      "Touch screen",
-      "USB/AUX",
-      "Leather seats",
-      "Sunroof",
-      "Premium sound system",
-      "Wireless charger",
-      "Sport mode",
-      "Performance tires",
-    ],
+      { id: "13", name: "Air conditioning" },
+      { id: "14", name: "GPS" },
+      { id: "15", name: "Bluetooth" },
+      { id: "16", name: "Rear camera" },
+      { id: "17", name: "Parking sensors" },
+      { id: "18", name: "Cruise control" },
+      { id: "19", name: "Touch screen" },
+      { id: "20", name: "USB/AUX" },
+    ]
   },
   motorcycle: {
+    id: "3",
     name: "Motorcycle",
-    attributes: {
-      engine: { label: "Engine Size", options: ["125cc", "250cc", "400cc", "600cc", "750cc", "1000cc+"] },
-      fuel: { label: "Fuel Type", options: ["Gasoline", "Electric"] },
-      type: { label: "Type", options: ["Sport", "Cruiser", "Touring", "Adventure", "Scooter"] },
-    },
-    features: [
-      "ABS",
-      "Traction control",
-      "Heated grips",
-      "Wind screen",
-      "Side cases",
-      "Top box",
-      "GPS mount",
-      "USB charger",
-      "LED lights",
+    attributes: [
+      {
+        id: "9",
+        attribute: "engine",
+        options: [
+          { id: "23", value: "125cc" },
+          { id: "24", value: "250cc" },
+          { id: "25", value: "400cc" },
+          { id: "26", value: "600cc" },
+          { id: "27", value: "750cc" },
+          { id: "28", value: "1000cc+" }
+        ]
+      },
+      {
+        id: "10",
+        attribute: "fuel",
+        options: [
+          { id: "29", value: "Gasoline" },
+          { id: "30", value: "Electric" }
+        ]
+      },
+      {
+        id: "11",
+        attribute: "type",
+        options: [
+          { id: "31", value: "Sport" },
+          { id: "32", value: "Cruiser" },
+          { id: "33", value: "Touring" },
+          { id: "34", value: "Adventure" },
+          { id: "35", value: "Scooter" }
+        ]
+      }
     ],
-  },
-  truck: {
-    name: "Truck",
-    attributes: {
-      transmission: { label: "Transmission", options: ["Automatic", "Manual"] },
-      fuel: { label: "Fuel Type", options: ["Gasoline", "Diesel", "Hybrid"] },
-      drivetrain: { label: "Drivetrain", options: ["RWD", "AWD", "4WD"] },
-      bedSize: { label: "Bed Size", options: ["Short", "Standard", "Long"] },
-      cab: { label: "Cab Type", options: ["Regular", "Extended", "Crew"] },
-    },
     features: [
-      "Air conditioning",
-      "GPS",
-      "Bluetooth",
-      "Rear camera",
-      "Parking sensors",
-      "Touch screen",
-      "USB/AUX",
-      "Bed liner",
-      "Tow package",
-      "Running boards",
-      "Tonneau cover",
-      "Tool box",
-    ],
-  },
+      { id: "21", name: "ABS" },
+      { id: "22", name: "Traction control" },
+      { id: "23", name: "Heated grips" },
+      { id: "24", name: "Wind screen" },
+      { id: "25", name: "Side cases" },
+      { id: "26", name: "Top box" },
+      { id: "27", name: "GPS mount" },
+      { id: "28", name: "USB charger" },
+      { id: "29", name: "LED lights" }
+    ]
+  }
 }
 
 export const brands: VehicleBrands = {
   sedan: ["Toyota", "Honda", "Nissan", "Chevrolet", "Mazda", "Volkswagen", "BMW", "Mercedes-Benz", "Audi"],
   suv: ["Toyota", "Honda", "Nissan", "Chevrolet", "Ford", "Jeep", "BMW", "Mercedes-Benz", "Audi", "Volvo"],
-  hatchback: ["Toyota", "Honda", "Nissan", "Chevrolet", "Mazda", "Volkswagen", "Ford"],
-  coupe: ["BMW", "Mercedes-Benz", "Audi", "Chevrolet", "Ford", "Nissan", "Toyota"],
   motorcycle: ["Honda", "Yamaha", "Kawasaki", "Suzuki", "Ducati", "BMW", "Harley-Davidson"],
-  truck: ["Ford", "Chevrolet", "Ram", "Toyota", "Nissan", "GMC"],
 }
 
 // Helper function to get category data safely
@@ -193,62 +212,19 @@ export const getBrandsForCategory = (categoryKey: string): string[] => {
   return brands[categoryKey] || []
 }
 
-// API-related types for future backend integration
-export interface ApiVehicleCategory {
-  id: string
-  name: string
-  slug: string
-  attributes: ApiVehicleAttribute[]
-  features: ApiVehicleFeature[]
+// Helper functions for working with the unified types
+export const getAttributeById = (attributes: VehicleAttribute[], id: string): VehicleAttribute | undefined => {
+  return attributes.find(attr => attr.id === id)
 }
 
-export interface ApiVehicleAttribute {
-  id: string
-  name: string
-  label: string
-  inputType: "select" | "text" | "number"
-  isRequired: boolean
-  options: ApiAttributeOption[]
+export const getAttributeByName = (attributes: VehicleAttribute[], name: string): VehicleAttribute | undefined => {
+  return attributes.find(attr => attr.attribute === name)
 }
 
-export interface ApiAttributeOption {
-  id: string
-  value: string
-  label: string
-  sortOrder: number
+export const getOptionById = (options: AttributeOption[], id: string): AttributeOption | undefined => {
+  return options.find(opt => opt.id === id)
 }
 
-export interface ApiVehicleFeature {
-  id: string
-  name: string
-  label: string
-  description?: string
-}
-
-// Helper functions for API data transformation
-export const transformApiCategoryToLocal = (apiCategory: ApiVehicleCategory): VehicleCategory => {
-  const attributes: Record<string, VehicleAttribute> = {}
-
-  apiCategory.attributes.forEach((attr) => {
-    attributes[attr.name] = {
-      label: attr.label,
-      options: attr.options.map((opt) => opt.label),
-    }
-  })
-
-  return {
-    name: apiCategory.name,
-    attributes,
-    features: apiCategory.features.map((f) => f.label),
-  }
-}
-
-export const transformApiCategoriesToLocal = (apiCategories: ApiVehicleCategory[]): VehicleCategories => {
-  const categories: VehicleCategories = {}
-
-  apiCategories.forEach((apiCategory) => {
-    categories[apiCategory.slug] = transformApiCategoryToLocal(apiCategory)
-  })
-
-  return categories
+export const getFeatureById = (features: VehicleFeature[], id: string): VehicleFeature | undefined => {
+  return features.find(feature => feature.id === id)
 }

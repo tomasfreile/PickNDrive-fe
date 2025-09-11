@@ -1,11 +1,12 @@
 "use client"
 
 import { Checkbox } from "@/components/ui/checkbox"
+import type { VehicleFeature } from "@/lib/vehicle-data"
 
 interface VehicleFeaturesProps {
-  features: string[]
+  features: VehicleFeature[]
   selectedFeatures: string[]
-  onFeatureToggle: (feature: string) => void
+  onFeatureToggle: (featureId: string) => void
 }
 
 export function VehicleFeatures({ features, selectedFeatures, onFeatureToggle }: VehicleFeaturesProps) {
@@ -15,21 +16,21 @@ export function VehicleFeatures({ features, selectedFeatures, onFeatureToggle }:
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {features.map((feature) => (
           <div
-            key={feature}
+            key={feature.id}
             className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-              selectedFeatures.includes(feature)
+              selectedFeatures.includes(feature.id)
                 ? "border-brand-primary bg-brand-primary-light text-brand-primary"
                 : "border-gray-200 hover:border-gray-300"
             }`}
-            onClick={() => onFeatureToggle(feature)}
+            onClick={() => onFeatureToggle(feature.id)}
           >
             <div className="flex items-center space-x-2">
               <Checkbox
-                checked={selectedFeatures.includes(feature)}
-                onChange={() => onFeatureToggle(feature)}
+                checked={selectedFeatures.includes(feature.id)}
+                onChange={() => onFeatureToggle(feature.id)}
                 className="pointer-events-none"
               />
-              <span className="text-sm">{feature}</span>
+              <span className="text-sm">{feature.name}</span>
             </div>
           </div>
         ))}

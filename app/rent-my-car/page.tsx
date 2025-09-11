@@ -48,6 +48,7 @@ export default function RentMyCarPage() {
     pricePerDay: "",
     rules: "",
     attributes: {},
+    features: [],
   })
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
@@ -73,12 +74,16 @@ export default function RentMyCarPage() {
     setUploadedImages(uploadedImages.filter((_, i) => i !== index))
   }
 
-  const toggleFeature = (feature: string) => {
-    setSelectedFeatures(
-      selectedFeatures.includes(feature)
-        ? selectedFeatures.filter((f) => f !== feature)
-        : [...selectedFeatures, feature],
-    )
+  const toggleFeature = (featureId: string) => {
+    const updatedFeatures = selectedFeatures.includes(featureId)
+      ? selectedFeatures.filter((f) => f !== featureId)
+      : [...selectedFeatures, featureId]
+    
+    setSelectedFeatures(updatedFeatures)
+    setVehicleData({
+      ...vehicleData,
+      features: updatedFeatures,
+    })
   }
 
   const handleAttributeChange = (attributeKey: string, value: string) => {
@@ -97,6 +102,7 @@ export default function RentMyCarPage() {
       category,
       brand: "",
       attributes: {},
+      features: [],
     })
     setSelectedFeatures([])
   }
@@ -177,8 +183,7 @@ export default function RentMyCarPage() {
 
   const canPublishVehicle = (): boolean => {
     if (!currentCategory || !termsValid) return false
-    const requiredAttributes = Object.keys(currentCategory.attributes)
-    return requiredAttributes.every((attr) => vehicleData.attributes[attr])
+    return currentCategory.attributes.every((attr) => vehicleData.attributes[attr.attribute])
   }
 
   return (

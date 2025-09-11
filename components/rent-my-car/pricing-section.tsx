@@ -23,7 +23,7 @@ export function PricingSection({ pricePerDay, onPriceChange }: PricingSectionPro
             className="pl-10"
             type="number"
             min="0"
-            step="0.01"
+            step="0.5"
             value={pricePerDay}
             onChange={(e) => onPriceChange(e.target.value)}
           />
