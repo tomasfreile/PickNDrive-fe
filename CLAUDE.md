@@ -30,7 +30,7 @@ This project uses npm as the package manager based on package.json structure.
 - **Database**: PostgreSQL with prepared schema (see `/database/schema.sql`)
 
 ### Project Structure
-```
+\`\`\`
 app/                    # Next.js App Router pages and API routes
 ├── api/               # API routes for backend functionality
 │   ├── categories/    # Vehicle category endpoints
@@ -59,7 +59,7 @@ lib/
 
 database/
 └── schema.sql        # PostgreSQL database schema for dynamic category system
-```
+\`\`\`
 
 ### Design System & Styling
 
