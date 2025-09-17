@@ -1,7 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Calendar, Clock, AlertCircle } from "lucide-react"
 import { Navbar } from "@/components/navbar"
 import { ProfileHeader } from "@/components/profile/profile-header"
 import { ProfileStats } from "@/components/profile/profile-stats"
@@ -11,6 +15,7 @@ import { MyBookings } from "@/components/profile/my-bookings"
 import { VehicleReviewModal } from "@/components/profile/vehicle-review-modal"
 
 export default function ProfilePage() {
+  const searchParams = useSearchParams()
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [selectedBooking, setSelectedBooking] = useState<any>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(true)
@@ -20,6 +25,9 @@ export default function ProfilePage() {
     email: "maria.gonzalez@email.com",
     avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format",
   })
+  
+  // Get the tab from URL params, default to "info"
+  const defaultTab = searchParams?.get('tab') || 'info'
 
   const [userData, setUserData] = useState({
     firstName: "Maria",
@@ -47,9 +55,23 @@ export default function ProfilePage() {
       totalReviews: 23,
       status: "Active",
       rentalDates: [
-        { startDate: "2024-12-15", endDate: "2024-12-18", renterName: "Carlos Ruiz" },
+        { startDate: "2024-12-10", endDate: "2024-12-13", renterName: "Roberto Silva" },
+        { startDate: "2024-12-16", endDate: "2024-12-19", renterName: "Carlos Ruiz" },
         { startDate: "2024-12-22", endDate: "2024-12-25", renterName: "Ana López" },
         { startDate: "2025-01-05", endDate: "2025-01-08", renterName: "Luis Martínez" },
+      ],
+    },
+    {
+      id: 2,
+      title: "Honda Civic 2023",
+      image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&h=300&fit=crop&auto=format",
+      price: 380,
+      rating: 4.6,
+      totalReviews: 18,
+      status: "Active",
+      rentalDates: [
+        { startDate: "2024-12-16", endDate: "2024-12-18", renterName: "María Fernández" },
+        { startDate: "2025-01-10", endDate: "2025-01-13", renterName: "Diego Morales" },
       ],
     },
   ]
@@ -89,6 +111,10 @@ export default function ProfilePage() {
       needsReview: false,
     },
   ]
+
+  // Separate bookings by type
+  const renterBookings = recentBookings.filter(booking => booking.type === "as_renter")
+  const ownerBookings = recentBookings.filter(booking => booking.type === "as_owner")
 
   const handleSavePersonalInfo = (data: any) => {
     setUserData(data)
@@ -136,11 +162,12 @@ export default function ProfilePage() {
 
           {/* Right Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            <Tabs defaultValue="info" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="info">Personal Information</TabsTrigger>
+            <Tabs defaultValue={defaultTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="info">Personal Info</TabsTrigger>
                 <TabsTrigger value="vehicles">My Vehicles</TabsTrigger>
-                <TabsTrigger value="bookings">My Bookings</TabsTrigger>
+                <TabsTrigger value="renter">My Trips</TabsTrigger>
+                <TabsTrigger value="owner">My Rentals</TabsTrigger>
               </TabsList>
 
               <TabsContent value="info" className="space-y-6">
@@ -151,8 +178,22 @@ export default function ProfilePage() {
                 <MyVehicles vehicles={myVehicles} />
               </TabsContent>
 
-              <TabsContent value="bookings" className="space-y-6">
-                <MyBookings bookings={recentBookings} onReviewClick={openReviewModal} />
+              <TabsContent value="renter" className="space-y-6">
+                <MyBookings 
+                  bookings={renterBookings} 
+                  onReviewClick={openReviewModal}
+                  title="My Trips"
+                  emptyMessage="You haven't booked any trips yet. Start exploring available vehicles!"
+                />
+              </TabsContent>
+
+              <TabsContent value="owner" className="space-y-6">
+                <MyBookings 
+                  bookings={ownerBookings} 
+                  onReviewClick={openReviewModal}
+                  title="My Rentals"
+                  emptyMessage="No one has booked your vehicles yet. Make sure your listings are active!"
+                />
               </TabsContent>
             </Tabs>
           </div>
