@@ -1,17 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Star, Filter, ArrowUpDown, Shield } from "lucide-react"
-import Image from "next/image"
+import { Search, Filter, ArrowUpDown } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Navbar } from "@/components/navbar"
+import { CarCard } from "@/components/car-card"
 
 export default function SearchPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -211,51 +208,7 @@ export default function SearchPage() {
           {/* Vehicle Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedVehicles.map((vehicle) => (
-              <Card
-                key={vehicle.id}
-                className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
-                onClick={() => router.push("/car-details")}
-              >
-                <div className="relative">
-                  <Image
-                    src={vehicle.image || "/placeholder.svg"}
-                    alt={vehicle.title}
-                    width={400}
-                    height={250}
-                    className="w-full h-56 object-cover"
-                  />
-                  <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-lg">
-                    <div className="flex items-center space-x-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-medium">{vehicle.rating}</span>
-                    </div>
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="font-bold text-xl mb-2">{vehicle.title}</h3>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {vehicle.features.slice(0, 3).map((feature, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {feature}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={vehicle.owner.avatar || "/placeholder.svg"} />
-                        <AvatarFallback>{vehicle.owner.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm text-gray-600">{vehicle.owner.name}</span>
-                      {vehicle.owner.verified && <Shield className="h-4 w-4 text-green-500" />}
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-2xl text-brand-primary">${vehicle.price}</div>
-                      <div className="text-sm text-gray-500">per day</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <CarCard key={vehicle.id} vehicle={vehicle} size="large" />
             ))}
           </div>
         </div>

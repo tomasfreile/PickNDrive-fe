@@ -168,9 +168,6 @@ export default function BookingDetailsPage() {
                     />
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg">{isOwner ? booking.renter.name : booking.owner.name}</h3>
-                      <div className="flex items-center space-x-1 text-sm text-gray-600">
-                        <span>★ {isOwner ? booking.renter.rating : booking.owner.rating}</span>
-                      </div>
                     </div>
                   </div>
                   
