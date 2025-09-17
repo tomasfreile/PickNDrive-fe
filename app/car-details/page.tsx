@@ -14,6 +14,13 @@ import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Navbar } from "@/components/navbar"
+import { 
+  getCategoryData, 
+  getAttributeByName, 
+  getOptionById, 
+  getFeatureById,
+  type VehicleCategory 
+} from "@/lib/vehicle-data"
 
 export default function CarDetailsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -57,15 +64,15 @@ export default function CarDetailsPage() {
       rating: 4.9,
       trips: 47,
     },
-    features: ["Automatic", "A/C", "GPS", "Bluetooth", "Backup Camera", "USB Ports"],
-    specifications: {
-      year: "2022",
-      seats: "5",
-      transmission: "Automatic",
-      fuel: "Gasoline",
-      doors: "4",
-      category: "Sedan",
+    category: "sedan",
+    year: "2022",
+    attributes: {
+      transmission: "1", // Automatic
+      fuel: "3", // Gasoline
+      doors: "7", // 4 doors
+      seats: "10", // 5 seats
     },
+    features: ["1", "2", "3", "4", "8"], // Air conditioning, GPS, Bluetooth, Rear camera, USB/AUX
     description:
       "Perfect car for city driving and short trips. Very comfortable and fuel efficient. The car is well maintained and always clean. Ideal for business trips or family outings.",
     available: true,
@@ -110,6 +117,31 @@ export default function CarDetailsPage() {
     e.preventDefault()
     alert("Booking request sent! The owner will contact you soon.")
     setShowBookingForm(false)
+  }
+
+  // Get category data for attributes and features
+  const categoryData = getCategoryData(vehicle.category)
+
+  // Helper function to get attribute value by name
+  const getAttributeValue = (attributeName: string): string => {
+    if (!categoryData) return ""
+    const attribute = getAttributeByName(categoryData.attributes, attributeName)
+    if (!attribute) return ""
+    const optionId = vehicle.attributes[attributeName]
+    if (!optionId) return ""
+    const option = getOptionById(attribute.options, optionId)
+    return option?.value || ""
+  }
+
+  // Helper function to get feature names
+  const getFeatureNames = (): string[] => {
+    if (!categoryData) return []
+    return vehicle.features
+      .map(featureId => {
+        const feature = getFeatureById(categoryData.features, featureId)
+        return feature?.name || ""
+      })
+      .filter(name => name !== "")
   }
 
   return (
@@ -180,22 +212,6 @@ export default function CarDetailsPage() {
               </CardHeader>
             </Card>
 
-            {/* Features */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Features</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {vehicle.features.map((feature, index) => (
-                    <Badge key={index} variant="secondary" className="justify-center py-2">
-                      {feature}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Specifications */}
             <Card>
               <CardHeader>
@@ -203,48 +219,42 @@ export default function CarDetailsPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <div className="text-sm text-gray-500">Year</div>
-                      <div className="font-medium">{vehicle.specifications.year}</div>
-                    </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Seats</div>
+                    <div className="font-medium">{getAttributeValue("seats")}</div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Users className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <div className="text-sm text-gray-500">Seats</div>
-                      <div className="font-medium">{vehicle.specifications.seats}</div>
-                    </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Transmission</div>
+                    <div className="font-medium">{getAttributeValue("transmission")}</div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Settings className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <div className="text-sm text-gray-500">Transmission</div>
-                      <div className="font-medium">{vehicle.specifications.transmission}</div>
-                    </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Fuel</div>
+                    <div className="font-medium">{getAttributeValue("fuel")}</div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Fuel className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <div className="text-sm text-gray-500">Fuel</div>
-                      <div className="font-medium">{vehicle.specifications.fuel}</div>
-                    </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Doors</div>
+                    <div className="font-medium">{getAttributeValue("doors")}</div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Car className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <div className="text-sm text-gray-500">Doors</div>
-                      <div className="font-medium">{vehicle.specifications.doors}</div>
-                    </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Category</div>
+                    <div className="font-medium">{categoryData?.name || ""}</div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <Car className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <div className="text-sm text-gray-500">Category</div>
-                      <div className="font-medium">{vehicle.specifications.category}</div>
-                    </div>
-                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Features */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Features</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {getFeatureNames().map((featureName, index) => (
+                    <Badge key={index} variant="secondary" className="justify-center py-2">
+                      {featureName}
+                    </Badge>
+                  ))}
                 </div>
               </CardContent>
             </Card>
