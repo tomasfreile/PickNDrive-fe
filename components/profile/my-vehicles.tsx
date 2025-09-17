@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Star, Calendar, Car, ChevronDown, ChevronUp } from "lucide-react"
+import { Star, Calendar, Car, ChevronDown, ChevronUp, Edit3, Check, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 
 interface Vehicle {
   id: number
@@ -29,6 +30,8 @@ interface MyVehiclesProps {
 
 export function MyVehicles({ vehicles }: MyVehiclesProps) {
   const [expandedVehicles, setExpandedVehicles] = useState<Set<number>>(new Set())
+  const [editingPrice, setEditingPrice] = useState<number | null>(null)
+  const [tempPrice, setTempPrice] = useState<string>("")
 
   const toggleExpanded = (vehicleId: number) => {
     const newExpanded = new Set(expandedVehicles)
@@ -38,6 +41,27 @@ export function MyVehicles({ vehicles }: MyVehiclesProps) {
       newExpanded.add(vehicleId)
     }
     setExpandedVehicles(newExpanded)
+  }
+
+  const startEditingPrice = (vehicleId: number, currentPrice: number) => {
+    setEditingPrice(vehicleId)
+    setTempPrice(currentPrice.toString())
+  }
+
+  const cancelEditingPrice = () => {
+    setEditingPrice(null)
+    setTempPrice("")
+  }
+
+  const savePrice = (vehicleId: number) => {
+    const newPrice = parseFloat(tempPrice)
+    if (newPrice && newPrice > 0) {
+      console.log(`Updating vehicle ${vehicleId} price to $${newPrice}`)
+      // Here you would make an API call to update the price
+      alert(`Price updated to $${newPrice}/day`)
+    }
+    setEditingPrice(null)
+    setTempPrice("")
   }
 
   return (
@@ -79,7 +103,7 @@ export function MyVehicles({ vehicles }: MyVehiclesProps) {
               }
 
               return (
-              <div key={vehicle.id} className="border rounded-lg p-6">
+              <div key={vehicle.id} className="border rounded-lg p-6 group">
                 <div className="flex items-start space-x-4 mb-4">
                   <Image
                     src={vehicle.image || "/placeholder.svg"}
@@ -91,7 +115,50 @@ export function MyVehicles({ vehicles }: MyVehiclesProps) {
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg mb-2">{vehicle.title}</h3>
                     <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                      <span>${vehicle.price}/day</span>
+                      <div className="flex items-center space-x-2">
+                        {editingPrice === vehicle.id ? (
+                          <div className="flex items-center space-x-2">
+                            <span>$</span>
+                            <Input
+                              type="number"
+                              value={tempPrice}
+                              onChange={(e) => setTempPrice(e.target.value)}
+                              className="w-20 h-7 text-sm"
+                              min="1"
+                              step="1"
+                            />
+                            <span>/day</span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => savePrice(vehicle.id)}
+                              className="h-7 w-7 p-0"
+                            >
+                              <Check className="h-3 w-3 text-green-600" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={cancelEditingPrice}
+                              className="h-7 w-7 p-0"
+                            >
+                              <X className="h-3 w-3 text-red-600" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-1">
+                            <span>${vehicle.price}/day</span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => startEditingPrice(vehicle.id, vehicle.price)}
+                              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Edit3 className="h-3 w-3 text-gray-500" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                       <div className="flex items-center space-x-1">
                         <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                         <span>{vehicle.rating}</span>
