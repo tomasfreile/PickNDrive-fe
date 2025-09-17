@@ -46,7 +46,6 @@ export default function BookingDetailsPage() {
       phone: "+52 81 1234 5678",
       email: "maria.gonzalez@email.com",
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face&auto=format",
-      rating: 4.9,
       verified: true
     },
     renter: {
@@ -54,7 +53,6 @@ export default function BookingDetailsPage() {
       phone: "+52 81 8765 4321",
       email: "carlos.ruiz@email.com",
       avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format",
-      rating: 4.7,
       verified: true
     },
   }
