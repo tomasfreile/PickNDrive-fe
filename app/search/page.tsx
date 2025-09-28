@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Search, Filter, ArrowUpDown } from "lucide-react"
+import { Search, Filter, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,7 @@ export default function SearchPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [sortBy, setSortBy] = useState("price")
+  const [sortDirection, setSortDirection] = useState<"none" | "asc" | "desc">("none")
   const [showFilters, setShowFilters] = useState(false)
   const router = useRouter()
 
@@ -133,10 +134,32 @@ export default function SearchPage() {
     },
   ]
 
+  const handleSortToggle = () => {
+    if (sortDirection === "none") {
+      setSortDirection("asc")
+    } else if (sortDirection === "asc") {
+      setSortDirection("desc")
+    } else {
+      setSortDirection("none")
+    }
+  }
+
+  const getSortIcon = () => {
+    if (sortDirection === "asc") return <ArrowUp className="h-4 w-4" />
+    if (sortDirection === "desc") return <ArrowDown className="h-4 w-4" />
+    return <ArrowUpDown className="h-4 w-4" />
+  }
+
   const sortedVehicles = [...vehicles].sort((a, b) => {
-    if (sortBy === "price") return a.price - b.price
-    if (sortBy === "rating") return b.rating - a.rating
-    return 0
+    if (sortDirection === "none") return 0
+
+    let comparison = 0
+    if (sortBy === "price") {
+      comparison = a.price - b.price
+    } else if (sortBy === "rating") {
+      comparison = a.rating - b.rating
+    }
+    return sortDirection === "asc" ? comparison : -comparison
   })
 
   return (
@@ -146,7 +169,7 @@ export default function SearchPage() {
       {/* Search Section */}
       <section className="bg-white border-b py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gray-50 rounded-xl p-6">
+          <div className="rounded-xl p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="relative">
                 <Input
@@ -191,7 +214,9 @@ export default function SearchPage() {
                 Filters
               </Button>
               <div className="flex items-center space-x-2">
-                <ArrowUpDown className="h-4 w-4 text-gray-500" />
+                <Button variant="outline" size="sm" onClick={handleSortToggle} className="p-2 bg-transparent">
+                  {getSortIcon()}
+                </Button>
                 <Select value={sortBy} onValueChange={setSortBy}>
                   <SelectTrigger className="w-32">
                     <SelectValue />
