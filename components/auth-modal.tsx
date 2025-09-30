@@ -105,7 +105,7 @@ export function AuthModal({ isOpen, onClose, onLogin, onRegister }: AuthModalPro
               </Button>
             </form>
             <div className="text-center">
-              <a href="#" className="text-sm text-blue-600 hover:underline">
+              <a href="/forgot-password" className="text-sm text-brand-primary hover:underline">
                 Forgot your password?
               </a>
             </div>
