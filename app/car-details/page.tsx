@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Navbar } from "@/components/navbar"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { 
   getCategoryData, 
   getAttributeByName, 
@@ -25,7 +26,7 @@ import {
 export default function CarDetailsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
-  const [showBookingForm, setShowBookingForm] = useState(false)
+  const [showImageGallery, setShowImageGallery] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -55,6 +56,11 @@ export default function CarDetailsPage() {
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/toyota-corolla-2022-0.jpg-C9hYkqAiVxqQLL6MqlRwYReGlPbhpe.jpeg",
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/NAZ_507736d0debd4e04a2b54a526b882856.jpg-VroFnn6oSQDofH73myLHKRvtWKQ1If.jpeg",
       "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Chevrolet-Aveo-2020-1.jpg-YwEyyzV331WXhtHggmrCeLlFP7iCjP.jpeg",
+      "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=600&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1590362891991-f776e747a588?w=800&h=600&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1619405399517-d7fce0f13302?w=800&h=600&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&h=600&fit=crop&auto=format",
     ],
     owner: {
       name: "María González",
@@ -110,13 +116,7 @@ export default function CarDetailsPage() {
       router.push("/auth")
       return
     }
-    setShowBookingForm(true)
-  }
-
-  const handleBookingSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
     alert("Booking request sent! The owner will contact you soon.")
-    setShowBookingForm(false)
   }
 
   // Get category data for attributes and features
@@ -177,15 +177,26 @@ export default function CarDetailsPage() {
                   className="w-full h-80 object-cover rounded-lg"
                 />
               </div>
-              {vehicle.images.slice(1).map((image, index) => (
-                <Image
-                  key={index}
-                  src={image || "/placeholder.svg"}
-                  alt={`${vehicle.title} ${index + 2}`}
-                  width={400}
-                  height={200}
-                  className="w-full h-40 object-cover rounded-lg"
-                />
+              {vehicle.images.slice(1, 3).map((image, index) => (
+                <div key={index} className="relative">
+                  <Image
+                    src={image || "/placeholder.svg"}
+                    alt={`${vehicle.title} ${index + 2}`}
+                    width={400}
+                    height={200}
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
+                  {index === 1 && vehicle.images.length > 3 && (
+                    <div
+                      onClick={() => setShowImageGallery(true)}
+                      className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center cursor-pointer hover:bg-black/70 transition-colors"
+                    >
+                      <span className="text-white text-2xl font-semibold">
+                        +{vehicle.images.length - 3} more
+                      </span>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
 
@@ -303,68 +314,54 @@ export default function CarDetailsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {!showBookingForm ? (
-                    <>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Start date</label>
-                          <Input type="date" className="w-full" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">End date</label>
-                          <Input type="date" className="w-full" />
-                        </div>
-                      </div>
-                      <Separator />
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span>${vehicle.price} × 3 days</span>
-                          <span>${vehicle.price * 3}</span>
-                        </div>
-                        <div className="flex justify-between font-semibold text-lg">
-                          <span>Total</span>
-                          <span>${vehicle.price * 3}</span>
-                        </div>
-                      </div>
-                      <Button onClick={handleBooking} className="w-full" size="lg">
-                        Book now
-                      </Button>
-                    </>
-                  ) : (
-                    <form onSubmit={handleBookingSubmit} className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Message to owner</label>
-                        <Textarea placeholder="Tell the owner about your trip plans..." className="w-full" rows={3} />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span>${vehicle.price} × 3 days</span>
-                          <span>${vehicle.price * 3}</span>
-                        </div>
-                        <div className="flex justify-between font-semibold text-lg">
-                          <span>Total</span>
-                          <span>${vehicle.price * 3}</span>
-                        </div>
-                      </div>
-                      <Button type="submit" className="w-full" size="lg">
-                        Send booking request
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setShowBookingForm(false)}
-                        className="w-full"
-                      >
-                        Cancel
-                      </Button>
-                    </form>
-                  )}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Start date</label>
+                      <Input type="date" className="w-full" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">End date</label>
+                      <Input type="date" className="w-full" />
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>${vehicle.price} × 3 days</span>
+                      <span>${vehicle.price * 3}</span>
+                    </div>
+                    <div className="flex justify-between font-semibold text-lg">
+                      <span>Total</span>
+                      <span>${vehicle.price * 3}</span>
+                    </div>
+                  </div>
+                  <Button onClick={handleBooking} className="w-full" size="lg">
+                    Book now
+                  </Button>
                 </CardContent>
               </Card>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Image Gallery Modal */}
+      <Dialog open={showImageGallery} onOpenChange={setShowImageGallery}>
+        <DialogContent className="max-w-4xl">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+            {vehicle.images.map((image, index) => (
+              <Image
+                key={index}
+                src={image || "/placeholder.svg"}
+                alt={`${vehicle.title} ${index + 1}`}
+                width={400}
+                height={300}
+                className="w-full h-48 object-cover rounded-lg"
+              />
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
